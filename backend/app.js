@@ -32,7 +32,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/posts", postsRoutes);
 app.use("/api/messages", messagesRoutes);
 
-server.listen(port, async () => {
+server.listen(process.env.PORT, async () => {
   console.log(`Server started at http://localhost:${process.env.PORT}`);
   await connectDB();
 });
