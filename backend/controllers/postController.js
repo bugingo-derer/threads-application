@@ -28,7 +28,7 @@ export const getPost = async (req, res) => {
 
 export const getRandomPosts = async (req, res) => {
   try {
-    const randomNumber = generateRandomNumber(40, 100)
+    const randomNumber = generateRandomNumber(10, 20)
     const randomPosts = await Post.aggregate([
       { $sample: { size: randomNumber } }
     ]).sort({createdAt: -1});
