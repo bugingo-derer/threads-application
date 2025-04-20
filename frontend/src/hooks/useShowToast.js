@@ -15,16 +15,6 @@ const useShowToast = () => {
 		},[toast]
 	);
 	
-	// const useShowToast = (title, description, status) => {
-	// 	return toast({
-	// 		title: title,
-	// 		description: description, 
-	// 		status: status,
-	// 		duration: 3000, 
-	// 		isClosable: true
-	// 	})
-	// }
-
 	return showToast;
 };
 

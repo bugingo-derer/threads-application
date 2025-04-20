@@ -8,6 +8,7 @@ import userAtom from "../atoms/userAtom";
 import { useSocket } from "../context/SocketContext";
 import { useState, useEffect, useRef } from "react";
 import messageSound from "../assets/sounds/message.mp3"
+import soundSettings from "../hooks/useSoundSettings";
 
 const MessageContainer = () => {
   const showToast = useShowToast();
@@ -19,15 +20,16 @@ const MessageContainer = () => {
   const currentUser = useRecoilValue(userAtom);
   const [, setConversations ] = useRecoilState(conversationsAtom);
   const messageEndRef = useRef(null);
-
+  const sound = useRecoilValue(soundSettings)
+  console.log(sound);
   useEffect(() => {
     if (!socket) return;
   
     const handleNewMessage = (message) => {
       if (selectedConversation._id === message.conversationId) {
         setMessages((prev) => [...prev, message]);
-  
-        if (!document.hasFocus()) {
+
+        if (!document.hasFocus() && sound) {
           const sound = new Audio(messageSound);
           sound.play().catch((err) => {
             showToast("Error", "Message sent but failed to play message sound:", "error")

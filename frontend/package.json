@@ -23,7 +23,7 @@
     "@emotion/styled": "^11.14.0",
     "@nikolovlazar/chakra-ui-prose": "^1.2.1",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.6.2",
+    "framer-motion": "^12.7.4",
     "numeral": "^2.0.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
