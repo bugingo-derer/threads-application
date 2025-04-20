@@ -50,7 +50,7 @@ const Homepage = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight) {
+      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight) {
         if (!fetchingMore) fetchMorePosts();
       }
     };
