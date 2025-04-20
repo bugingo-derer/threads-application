@@ -72,7 +72,7 @@ const Homepage = () => {
           </Flex>
         ) : (
           posts.map((post, idx) => (
-            <Post key={idx} post={post} postedBy={post.postedBy} />
+            <Post key={post._id || idx} post={post} postedBy={post.postedBy} />
           ))
         )}
 

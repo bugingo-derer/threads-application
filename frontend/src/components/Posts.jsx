@@ -8,13 +8,15 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom.js";
 import postsAtom from "../atoms/PostsAtom.js";
+import { motion } from "framer-motion";
 
+const MotionBox = motion(Box);
 const Post = ({ post, postedBy   }) => {
   const [user, setUser] = useState(null);
   const showToast = useShowToast();
   const navigate = useNavigate();
   const currentUser = useRecoilValue(userAtom);
-  const [posts, setPosts] = useRecoilState(postsAtom)
+  const [posts, setPosts] = useRecoilState(postsAtom);
   
   useEffect(() => {
     const getUser = async () => {
@@ -55,50 +57,49 @@ const Post = ({ post, postedBy   }) => {
   }
 
   return (
-    <Link to={`/${user?.username}/posts/${post?._id}`}>
-      <Flex gap={3} mb={4} py={5}>
-        
-        <Flex flexDirection={"column"} alignItems={"center"} onClick={(e) => { e.preventDefault(); if (user) navigate(`/${user.username}`); } }>
-          <Avatar size={"md"} name={user?.name} src={user?.profilePic} />
-          <Box w={"1px"} h={"full"} bg={"gray.light"} my={2}></Box>
-          <SimpleGrid columns={post?.replies.length >= 3 ? 3 : (post?.replies.length%3)} spacing={0} justifyContent="center">
-            {post?.replies.length === 0 && (<Text textAlign={"center"} fontSize={"2xl"}>😭</Text>)}
-            {post?.replies.slice(0, 3).map((reply, index) => (
-              <Avatar key={index} size={"xs"} name={reply?.username} src={reply?.userProfilePic} m={1} />
-            ))}
-          </SimpleGrid>
-          
-        </Flex>
-
-        {/* Post Content */}
-        <Flex flex={1} flexDirection={"column"} gap={2}>
-          <Flex justifyContent={"space-between"} w={"full"}>
-            <Flex alignItems={"center"} mb={"20px"} onClick={(e) => { e.preventDefault(); if (user) navigate(`/${user.username}`); }}>
-              <Text fontSize={"sm"} fontWeight={"bold"}>{user?.username}</Text>
-              <Image src='/verified.png' w={4} h={4} ml={1} />
+    <MotionBox initial={{ scale: .8 }} whileInView={{ scale: 1 }} transition={{ duration: .3, ease: "easeInOut", delay: .2, stiffness: 120, damping: 12, type:"spring" }} viewport={{ once: true }} mb={4}>
+      <Link to={`/${user?.username}/posts/${post?._id}`}>
+        <Flex gap={3} mb={4} py={5}>
+      
+          <Flex flexDirection={"column"} alignItems={"center"} onClick={(e) => { e.preventDefault(); if (user) navigate(`/${user.username}`); } }>
+            <Avatar size={"md"} name={user?.name} src={user?.profilePic} />
+            <Box w={"1px"} h={"full"} bg={"gray.light"} my={2}></Box>
+            <SimpleGrid columns={post?.replies.length >= 3 ? 3 : (post?.replies.length%3)} spacing={0} justifyContent="center">
+              {post?.replies.length === 0 && (<Text textAlign={"center"} fontSize={"2xl"}>😭</Text>)}
+              {post?.replies.slice(0, 3).map((reply, index) => (
+                <Avatar key={index} size={"xs"} name={reply?.username} src={reply?.userProfilePic} m={1} />
+              ))}
+            </SimpleGrid>
+      
+          </Flex>
+          {/* Post Content */}
+          <Flex flex={1} flexDirection={"column"} gap={2}>
+            <Flex justifyContent={"space-between"} w={"full"}>
+              <Flex alignItems={"center"} mb={"20px"} onClick={(e) => { e.preventDefault(); if (user) navigate(`/${user.username}`); }}>
+                <Text fontSize={"sm"} fontWeight={"bold"}>{user?.username}</Text>
+                <Image src='/verified.png' w={4} h={4} ml={1} />
+              </Flex>
+              <Flex gap={4} alignItems={"center"}>
+                <Text fontSize={"sm"} color={"gray.light"}>
+                  {formatDate(post?.createdAt)}
+                </Text>
+                {currentUser?._id === user?._id && <DeleteIcon onClick={handleDeletePost}/>}
+              </Flex>
             </Flex>
-            <Flex gap={4} alignItems={"center"}>
-              <Text fontSize={"sm"} color={"gray.light"}>
-                {formatDate(post?.createdAt)}
-              </Text>
-              {currentUser?._id === user?._id && <DeleteIcon onClick={handleDeletePost}/>}
+            <Text fontSize={"sm"}>{post?.text}</Text>
+            {post?.img && (
+              <Box borderRadius={6} overflow={"hidden"} border={"1px solid"} borderColor={"gray.light"}>
+                <Image src={post?.img} w={"full"} />
+              </Box>
+            )}
+            {/* Actions Section */}
+            <Flex gap={3} my={1}>
+              <Actions post={post} />
             </Flex>
           </Flex>
-
-          <Text fontSize={"sm"}>{post?.text}</Text>
-          {post?.img && (
-            <Box borderRadius={6} overflow={"hidden"} border={"1px solid"} borderColor={"gray.light"}>
-              <Image src={post?.img} w={"full"} />
-            </Box>
-          )}
-
-          {/* Actions Section */}
-          <Flex gap={3} my={1}>
-            <Actions post={post} />
-          </Flex>
         </Flex>
-      </Flex>
-    </Link>
+      </Link>
+    </MotionBox>
   );
 };
 
