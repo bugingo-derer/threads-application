@@ -4,13 +4,15 @@ import {
   createPost, 
   deletePosts, 
   getFeedPosts, 
-  getPost, 
+  getPost,
+  getRandomPosts,
   getUserPosts, 
   likeUnlikePost, 
   replyToPost
 } from "../controllers/postController.js";
 const router = express.Router();
 
+router.get("/randomPosts", getRandomPosts)
 router.get("/feed",protectRoute, getFeedPosts)
 router.get("/:id", getPost)
 router.get("/user/:username", getUserPosts)

@@ -20,7 +20,7 @@ export const getuserProfile = async (req, res) => {
 
     if(!user)
       return res.status(400).json({error:"User not found"});
-
+    
     return res.status(200).json(user);
   } catch (error) {
     console.log("Error in getuserProfile, userController", Error);

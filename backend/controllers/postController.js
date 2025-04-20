@@ -3,6 +3,7 @@ import Post from "../models/postModel.js";
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
 import {v2 as cloudinary} from "cloudinary"
+import generateRandomNumber from "../utils/generateRandomNumber.js";
 
 
 export const getPost = async (req, res) => {
@@ -24,6 +25,20 @@ export const getPost = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 } 
+
+export const getRandomPosts = async (req, res) => {
+  try {
+    const randomNumber = generateRandomNumber(40, 100)
+    const randomPosts = await Post.aggregate([
+      { $sample: { size: randomNumber } }
+    ]).sort({createdAt: -1});
+    
+    res.status(200).json(randomPosts);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json(error.message);
+  }
+}
  
 export const deletePosts = async (req, res) => {
     try {
