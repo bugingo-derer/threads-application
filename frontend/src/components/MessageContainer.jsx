@@ -21,7 +21,6 @@ const MessageContainer = () => {
   const [, setConversations ] = useRecoilState(conversationsAtom);
   const messageEndRef = useRef(null);
   const sound = useRecoilValue(soundSettings)
-  console.log(sound);
   useEffect(() => {
     if (!socket) return;
   
