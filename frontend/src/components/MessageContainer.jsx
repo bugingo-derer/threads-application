@@ -99,7 +99,7 @@ const MessageContainer = () => {
         const data = await res.json();
         if (data.error) return showToast("Error", data.error, "error");
   
-        if (isMounted) setMessages(data);
+        if (isMounted) setMessages(data.reverse());
       } catch (error) {
         showToast("Error", error.message, "error");
       } finally {

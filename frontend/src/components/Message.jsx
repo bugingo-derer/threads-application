@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { selectedConversationAtom } from '../atoms/conversationsAtom'
 import userAtom from '../atoms/userAtom'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDate } from "../utils/formatData.js";
 import { BsCheck2All } from 'react-icons/bs'
 
 const Message = ({ message, ownMessage }) => {
@@ -12,9 +12,8 @@ const Message = ({ message, ownMessage }) => {
   const [imgLoaded, setImgLoaded] = useState(false)
   const [imgError, setImgError] = useState(false)
 
-  const time = formatDistanceToNow(message.createdAt, {
-    addSuffix: true,
-  }).replace(/^about\s/, '')
+  const time = formatDate(message?.createdAt)
+.replace(/^about\s/, '')
 
   return (
     <Flex

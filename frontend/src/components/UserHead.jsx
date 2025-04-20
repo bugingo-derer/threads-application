@@ -2,16 +2,14 @@ import { VStack, Flex, Box, Text, Link, Button, Spinner } from "@chakra-ui/react
 import { Avatar } from "@chakra-ui/avatar"
 import { Portal } from "@chakra-ui/portal";
 import { Menu, MenuButton, MenuList, MenuItem} from '@chakra-ui/menu';
-import { useToast } from '@chakra-ui/toast';
-
 import { BsInstagram } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
-import { errorSelector, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
-import { Link as RouterLink } from "react-router-dom" 
-import { useEffect, useState } from "react";
+import { Link as RouterLink } from "react-router-dom"
 import useShowToast from "../hooks/useShowToast";
 import useFollowing from "../hooks/useFollowing";
+import {formatNumber} from "../utils/formatData.js";
 
 const UserHead = ({user}) => {
    
@@ -21,17 +19,10 @@ const UserHead = ({user}) => {
 
   const copyURL = () => {
     const currentURL = window.location.href;
-    navigator.clipboard.writeText(currentURL).then(() => {
-      showToast("URL", 'Copied to clipboard', 'success');
-    }).catch(error => {
-      console.error("Failed to copy URL: ", error);
-    });
+    navigator.clipboard.writeText(currentURL)
+    .then(() => showToast("URL", 'Copied to clipboard', 'success'))
+    .catch(error => console.error("Failed to copy URL: ", error));
   };
-  
-  const styles_followbutton = {
-    follow: "bg.red.200",
-    unfollow: "bg.blue.200"
-  }
 
   return (
     <VStack gap={4} alignItems={"start"}>
@@ -69,9 +60,13 @@ const UserHead = ({user}) => {
 
       <Flex w={"full"} justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
-          <Text color={"gray.light"}>{user?.followers.length} followers</Text>
+          <Text color={"gray.light"}>
+            {formatNumber(user?.followers.length)} {user?.followers.length > 1 ? ` followers`: ` follower`}
+          </Text>
           <Box w={1} h={1} bg={"gray.light"} borderRadius={"full"}></Box>
-          <Link color={"gray.light"}>instagram.com</Link>
+          <Text color={"gray.light"}>
+            {formatNumber(user?.following.length)} following
+          </Text>
         </Flex>
 
         <Flex>

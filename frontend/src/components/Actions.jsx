@@ -56,7 +56,7 @@ const Actions = ({ post }) => {
   };
 
   const handleReply = async () => {
-    if (!user) return showToast("Error", "You must log in to reply a post", "error");
+    if (!user) return showToast("Error", "You must log in to reply to a post", "error");
     if (isReplying) return;
     setIsReplying(true);
     try {
@@ -75,9 +75,9 @@ const Actions = ({ post }) => {
       setPosts(updatedPosts);
       showToast("Success", "Reply sent successfully", "success");
       onClose();
-      return setReply("");
+      setReply("");
     } catch (error) {
-      return showToast("Error", error.message, "error");
+      showToast("Error", error.message, "error");
     } finally {
       setIsReplying(false);
     }
@@ -92,9 +92,13 @@ const Actions = ({ post }) => {
         <ShareSVG />
       </Flex>
       <Flex gap={2} alignItems={"center"}>
-        <Text color={"gray.light"} fontSize={"sm"}>{post.replies.length}{post.replies.length <= 1 ? " reply" : " replies"}</Text>
-        <Box borderRadius={"full"} w={1} h={1} bg={"gray.light"}></Box>
-        <Text color={"gray.light"} fontSize={"sm"}>{post.likes.length}{post.likes.length <= 1 ? " like" : " likes"}</Text>
+        <Text color={"gray.light"} fontSize={"sm"}>
+          {post.replies.length} {post.replies.length <= 1 ? "reply" : "replies"}
+        </Text>
+        <Box borderRadius={"full"} w={1} h={1} bg={"gray.light"} />
+        <Text color={"gray.light"} fontSize={"sm"}>
+          {post.likes.length} {post.likes.length <= 1 ? "like" : "likes"}
+        </Text>
       </Flex>
 
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -104,11 +108,11 @@ const Actions = ({ post }) => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <FormControl>
-              <Input type="text" placeholder="Reply goes here..." value={reply} onChange={(e) => setReply(e.target.value)} />
+              <Input type="text" placeholder="Reply goes here..." value={reply} onChange={(e) => setReply(e.target.value)}/>
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" size="sm" mr={3} onClick={handleReply} isDisabled={isReplying}>
+            <Button colorScheme="blue" size="sm" mr={3} onClick={handleReply} isDisabled={isReplying || !reply.trim()} >
               {isReplying ? <Spinner size="md" /> : "Reply"}
             </Button>
           </ModalFooter>

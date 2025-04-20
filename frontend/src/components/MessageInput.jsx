@@ -20,7 +20,7 @@ const MessageInput = ({ setMessages }) => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!messageText && !imgUrl) {
-      showToast('Warning', 'Please enter a message or select an image to send.', 'warning');
+      showToast('Warning', 'Please enter a message or select an image to send.', 'error');
       return;
     }
     if (sending) return;
@@ -43,7 +43,6 @@ const MessageInput = ({ setMessages }) => {
 
       setMessages((messages) => [...messages, data]);
 
-      // Updating only the selected conversation
       setConversations((prevConvs) => {
         return prevConvs.map((conversation) =>
           conversation._id === selectedConversation._id
@@ -72,13 +71,7 @@ const MessageInput = ({ setMessages }) => {
     <Flex gap={2} alignItems={'center'}>
       <form onSubmit={handleSendMessage} style={{ flex: 95 }}>
         <InputGroup>
-          <Input
-            w={'full'}
-            placeholder='Type text'
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            isDisabled={sending}
-          />
+          <Input w={'full'} placeholder='Type text' value={messageText} onChange={(e) => setMessageText(e.target.value)} isDisabled={sending}/>
           <InputRightElement onClick={(e) => { e.preventDefault(); handleSendMessage(e); }} cursor={'pointer'}>
             {sending ? <Spinner /> : <IoSendSharp color='green.500' />}
           </InputRightElement>

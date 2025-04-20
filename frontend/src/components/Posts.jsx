@@ -1,11 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar, Flex, Box, SimpleGrid, Image, Text } from "@chakra-ui/react";
-import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/menu";
-import { BsThreeDots } from "react-icons/bs";
 import Actions from "./Actions.jsx";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast.js";
-import { formatDistanceToNowStrict } from "date-fns"
+import { formatDate } from "../utils/formatData.js";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom.js";
@@ -81,10 +79,7 @@ const Post = ({ post, postedBy   }) => {
             </Flex>
             <Flex gap={4} alignItems={"center"}>
               <Text fontSize={"sm"} color={"gray.light"}>
-                {formatDistanceToNowStrict (new Date(post?.createdAt), { 
-                  addSuffix: true, 
-                  roundingMethod: "floor" 
-                })}
+                {formatDate(post?.createdAt)}
               </Text>
               {currentUser?._id === user?._id && <DeleteIcon onClick={handleDeletePost}/>}
             </Flex>

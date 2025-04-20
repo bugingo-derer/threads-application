@@ -6,6 +6,7 @@ import Joi from 'joi';
 import { getRecipientSocketId, io } from '../sockets/socket.js';
 import { v2 as cloudinary } from "cloudinary"
 
+
 export const getMessages = async (req, res) => {
   try {
     const otherUserId  = _.get(req.params, "otherUserId");
@@ -20,7 +21,7 @@ export const getMessages = async (req, res) => {
 
     const messages = await Message.find({
       conversationId: conversation._id
-    }).sort({createAt: -1})
+    }).sort({createdAt: -1})
 
     res.status(200).json(messages)
   } catch (error) {
@@ -31,30 +32,27 @@ export const getMessages = async (req, res) => {
 
 export const getConversations = async (req, res) => {
   try {
-    const userId = req.user._id; 
+    const userId = req.user._id;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "Invalid userId", userId });
     }
 
     const conversations = await Conversation.find({ participants: userId })
-    .populate({
-        path: "participants",
-        select: "username profilePic",
-    });
+      .populate("participants", "username profilePic")
+      .lean(); 
 
-    //remove the current user from the conversation
-
-    conversations.forEach(conversation => {
-      conversation.participants = conversation.participants.filter(
+    const sanitizedConversations = conversations.map(convo => ({
+      ...convo,
+      participants: convo.participants.filter(
         participant => participant._id.toString() !== userId.toString()
       )
-    });
+    }));
 
-    res.status(200).json(conversations);
+    res.status(200).json(sanitizedConversations);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching conversations:", error);
+    res.status(500).json({ error: error.message || "Server Error" });
   }
 };
 
@@ -85,24 +83,18 @@ export const sendMessage = async (req, res) => {
       await conversation.save();
     }
 
-    if(img){
-      const uploadingResponse = await cloudinary.uploader.upload(img);
-      img = cloudinary.url(uploadingResponse.public_id, {
-        transformation: [
-          {
-            quality: 'auto',
-            fetch_format: 'auto'
-          },
-          {
-            width: 1200,
-            height: 1200,
-            crop: 'fill',
-            gravity: 'auto'
-          }
-        ]
-      })
+    if (img) {
+      const uploaded = await cloudinary.uploader.upload(img, {
+        quality: "auto",
+        fetch_format: "auto",
+        width: 1200,
+        height: 1200,
+        crop: "fill",
+        gravity: "auto"
+      });
+      img = uploaded.secure_url;
     }
-
+    
     const newMessage = new Message({
       conversationId: conversation._id,
       sender: senderId,
