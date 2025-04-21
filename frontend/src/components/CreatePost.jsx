@@ -29,7 +29,7 @@ const CreatePost = () => {
   const showToast = useShowToast();
   const [isPosting, setIsPosting] = useState(false);
   const [posts, setPosts] = useRecoilState(postsAtom);
-  const { username } = useParams()
+  const { username } = useParams();
 
   const handleTextChange = (e) => {
     const inputText = e.target.value;
@@ -49,7 +49,7 @@ const CreatePost = () => {
       const res = await fetch("/api/posts/create", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({postedBy: user._id, text: postText, img: imgUrl})
+        body: JSON.stringify({postedBy: user._id, text: postText, img: imgUrl}),
       });
   
       const data = await res.json();
@@ -71,10 +71,7 @@ const CreatePost = () => {
   
   return (
     <>
-      <Button 
-        onClick={onOpen} position={"fixed"} right={10} bottom={10} size={"lg"} 
-        rightIcon={showIcon ? <AddIcon /> : null} bg={useColorModeValue("gray.300", "gray.dark")}
-      >
+      <Button onClick={onOpen} position={"fixed"} right={10} bottom={10} size={"lg"}  rightIcon={showIcon ? <AddIcon /> : null} bg={useColorModeValue("gray.300", "gray.dark")}>
         {showText && <span>create post</span>}
       </Button>
 
@@ -86,7 +83,7 @@ const CreatePost = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <FormControl>
-              <Textarea placeholder="Post content goes here..." onChange={handleTextChange} value={postText} />
+              <Textarea placeholder="Post content goes here..." onChange={handleTextChange} value={postText} height={"200px"} resize={"none"}/>
               <Text fontSize={"xs"} fontWeight={"bold"} textAlign={"right"} m={1} color={"gray.800"}>
                 {remainingChars}/{MAX_CHAR}
               </Text>
@@ -104,7 +101,7 @@ const CreatePost = () => {
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={handleCreatePost}>
-              {isPosting ? <Spinner size="xl" /> :"Post"}
+              {isPosting ? <Spinner size="md" /> :"Post"}
             </Button>
           </ModalFooter>
 

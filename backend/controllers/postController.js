@@ -1,6 +1,6 @@
 import _ from "lodash";
-import Post from "../models/postModel.js";
 import mongoose from "mongoose";
+import Post from "../models/postModel.js";
 import User from "../models/userModel.js";
 import {v2 as cloudinary} from "cloudinary"
 import generateRandomNumber from "../utils/generateRandomNumber.js";
@@ -198,4 +198,28 @@ export const getUserPosts = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
+}
+
+export const forwardPost = async (req, res) => {
+  const userId = _.get(req.user, "_id");
+  const postId = _.get(req.params, "id");
+  try {
+    const original_post = await Post.findById(postId).select("-likes -replies -createdAt -updatedAt -__v");
+
+    const newPost = {
+      postedBy: userId,
+      originalPostId: original_post._id,
+      text: original_post.text,
+      img: original_post.img,
+    }
+
+    const forwardpost = new Post(newPost);
+    await forwardpost.save();
+
+    return res.status(200).json(forwardpost);
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json(error.message)
+  }
 }

@@ -1,11 +1,15 @@
 import mongoose from "mongoose";
 import User from "./userModel.js";
 
-const postSchema = mongoose.Schema({
+const repostSchema = mongoose.Schema({
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: User,
     required: true,
+  },
+  originalPostId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post',
   },
   text: {
     type: String,
@@ -42,6 +46,13 @@ const postSchema = mongoose.Schema({
   timestamps: true,
 });
 
-const Post = mongoose.model('Post', postSchema);
+repostSchema.pre('save', function (next) {
+  if (!this.originalPostId) {
+    this.originalPostId = this._id;
+  }
+  next();
+});
+
+const Post = mongoose.model('Post', repostSchema);
 
 export default Post;

@@ -29,13 +29,7 @@ const Header = () => {
 				</Link>
 			)}
 
-			<Image
-				cursor={"pointer"}
-				alt='logo'
-				w={6}
-				src={colorMode === "dark" ? "/light-logo.svg" : "/dark-logo.svg"}
-				onClick={toggleColorMode}
-			/>
+			<Image cursor={"pointer"} alt='logo' w={6} src={colorMode === "dark" ? "/light-logo.svg" : "/dark-logo.svg"} onClick={toggleColorMode}/>
 
 			{user && (
 				<Flex alignItems={"center"} gap={4}>

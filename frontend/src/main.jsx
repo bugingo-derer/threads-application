@@ -24,7 +24,7 @@ const styles = {
 
 const config = {
   initialColorMode: "dark",
-  useSystemColorMode: true,
+  useSystemColorMode: false,
 };
 
 const colors = {
@@ -37,7 +37,7 @@ const colors = {
 const theme = extendTheme({ config, styles, colors });
 
 createRoot(document.getElementById('root')).render(
-    <>
+    <StrictMode>
       <RecoilRoot>
         <BrowserRouter>
           <ChakraProvider theme={theme}>
@@ -49,5 +49,5 @@ createRoot(document.getElementById('root')).render(
         </BrowserRouter>
       </RecoilRoot>
       <ToastContainer />
-    </>
+    </StrictMode>
 );

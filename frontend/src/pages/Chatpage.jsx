@@ -23,19 +23,14 @@ const Chatpage = () => {
   const { socket, onlineUsers } = useSocket()
 
   useEffect(() => {
-    if (!socket) return
+    if (!socket) return;
+    if(!conversations.mock) return;
 
     const handleMessageSeen = ({ conversationId }) => {
       setConversations(prev =>
         prev.map(convo =>
           convo._id === conversationId
-            ? {
-                ...convo,
-                lastMessage: {
-                  ...convo.lastMessage,
-                  seen: true
-                }
-              }
+            ? {...convo,lastMessage: { ...convo.lastMessage, seen: true}}
             : convo
         )
       )
@@ -150,7 +145,7 @@ const Chatpage = () => {
           {!loadingConversations &&
             conversations.map((conversation, idx) => (
               <Conversation key={idx} conversation={conversation} isOnline={onlineUsers.includes(conversation.participants[0]._id)} />
-            ))}
+          ))}
         </Flex>
 
         {!selectedConversation._id && (
@@ -160,7 +155,7 @@ const Chatpage = () => {
           </Flex>
         )}
 
-        {selectedConversation._id && <MessageContainer />}
+        {selectedConversation._id && <MessageContainer conversations={conversations} />}
       </Flex>
     </Box>
   )

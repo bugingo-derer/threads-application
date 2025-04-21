@@ -19,8 +19,8 @@ const Postpage = () => {
   const { pid } = useParams();
   const currentUser = useRecoilValue(userAtom);
   const navigate = useNavigate();
-
   const currentPost = posts[0];
+  const [originalDeleted, setOriginalDeleted] = useState(false);
 
   useEffect(() => {
     const getPosts = async () => {
@@ -54,6 +54,29 @@ const Postpage = () => {
     }
   };
 
+  useEffect(() => {
+    const checkOriginal = async () => {
+      if (
+        currentPost?.originalPostId &&
+        currentPost?.originalPostId !== currentPost?._id
+      ) {
+        try {
+          const res = await fetch(`/api/posts/${currentPost.originalPostId}`);
+          const data = await res.json();
+          if (res.status === 404 || data.error === "Post not found") {
+            setOriginalDeleted(true);
+          }
+        } catch (err) {
+          console.error("Error checking original post:", err);
+          setOriginalDeleted(true);
+        }
+      }
+    };
+    if (currentPost) {
+      checkOriginal();
+    }
+  }, [currentPost]);
+
   if (loading) {
     return (
       <Flex justifyContent={"center"} alignItems="center" h="100vh">
@@ -71,52 +94,54 @@ const Postpage = () => {
   }
 
   return (
-    <>
-      <Flex direction="column" w="full" p={4}>
-        <Flex w={"full"} alignItems={"center"} gap={3}>
-          <Avatar src={user?.profilePic} size={"md"} name="Sun Jin Woo" />
-          <Flex>
+    <Flex direction="column" w="full" p={4}>
+      <Flex w={"full"} alignItems={"center"} gap={3}>
+        <Avatar src={user?.profilePic} size={"md"} name="Sun Jin Woo" />
+        <Flex flexDir="column">
+          <Flex alignItems="center" gap={2}>
             <Text fontSize={"sm"} fontWeight={"bold"}>{user?.username}</Text>
-            <Image src="/verified.png" w={4} h={4} ml={4} />
+            <Image src="/verified.png" w={4} h={4} />
           </Flex>
-        </Flex>
-
-        <Flex gap={4} alignItems={"center"}>
-          <Text fontSize={"sm"} color={"gray.light"}>
-            {formatDate(currentPost?.createdAt)}
-          </Text>
-          {currentUser?._id === user?._id && user && (
-            <DeleteIcon onClick={handleDeletePost} cursor={"pointer"} size={20} />
+          {currentPost.originalPostId && currentPost.originalPostId !== currentPost._id && (
+            <Flex alignItems="center" gap={2}>
+              <Text fontSize="xs">shared story</Text>
+              {originalDeleted && (<Text fontSize="2xs" color="red.400">original story no longer available</Text>)}
+            </Flex>
           )}
         </Flex>
-
-        <Text my={3}>{currentPost?.text}</Text>
-
-        {currentPost?.img && (
-          <Box borderRadius={6} overflow={"hidden"} border={"1px solid"} borderColor={"gray.light"}>
-            <Image src={currentPost?.img} w={"full"} />
-          </Box>
-        )}
-
-        <Flex gap={3} my={3}>
-          <Actions post={currentPost} />
-        </Flex>
-
-        <Divider my={6} />
-        <Flex justifyContent={"space-between"}>
-          <Flex gap={2} alignItems={"center"}>
-            <Text fontSize={"2xl"}>✌️</Text>
-            <Text color={"gray.light"}>An app to like, post, reply and chat</Text>
-          </Flex>
-          <Button>Get</Button>
-        </Flex>
-        <Divider my={6} />
-
-        {currentPost.replies?.map((reply) => (
-          <Comment key={reply._id} reply={reply} lastReply={reply._id === currentPost.replies[currentPost.replies.length - 1]._id} />
-        ))}
       </Flex>
-    </>
+
+      <Flex gap={4} alignItems={"center"} mt={2}>
+        <Text fontSize={"sm"} color={"gray.light"}>
+          {formatDate(currentPost?.createdAt)}
+        </Text>
+        {currentUser?._id === user?._id && user && (<DeleteIcon onClick={handleDeletePost} cursor={"pointer"} />)}
+      </Flex>
+
+      <Text my={3}>{currentPost?.text}</Text>
+
+      {currentPost?.img && (
+        <Box borderRadius={6} overflow={"hidden"} border={"1px solid"} borderColor={"gray.light"}>
+          <Image src={currentPost?.img} w={"full"} />
+        </Box>
+      )}
+
+      <Flex gap={3} my={3}>
+        <Actions post={currentPost} />
+      </Flex>
+
+      <Divider my={6} />
+      <Flex justifyContent={"space-between"}>
+        <Flex gap={2} alignItems={"center"}>
+          <Text fontSize={"2xl"}>✌️</Text>
+          <Text color={"gray.light"}>An app to like, post, reply and chat</Text>
+        </Flex>
+        <Button>Get</Button>
+      </Flex>
+      <Divider my={6} />
+
+      {currentPost.replies?.map((reply) => (<Comment key={reply._id} reply={reply} lastReply={reply._id === currentPost.replies[currentPost.replies.length - 1]._id}/>))}
+    </Flex>
   );
 };
 

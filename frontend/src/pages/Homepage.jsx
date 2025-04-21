@@ -61,7 +61,7 @@ const Homepage = () => {
 
   return (
     <Flex gap={10} alignItems="flex-start" direction={{ base: "column", md: "row" }}>
-      <Box flex={30} order={{ base: 1, md: 2 }} w="full">
+      <Box flex={30} order={{ base: 1, md: 2 }} w="full" className="">
         <SuggestedUser />
       </Box>
 

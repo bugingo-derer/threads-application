@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import messageSound from "../assets/sounds/message.mp3"
 import soundSettings from "../hooks/useSoundSettings";
 
-const MessageContainer = () => {
+const MessageContainer = ({conversations}) => {
   const showToast = useShowToast();
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [messages, setMessages] = useState([]);
@@ -20,7 +20,8 @@ const MessageContainer = () => {
   const currentUser = useRecoilValue(userAtom);
   const [, setConversations ] = useRecoilState(conversationsAtom);
   const messageEndRef = useRef(null);
-  const sound = useRecoilValue(soundSettings)
+  const sound = useRecoilValue(soundSettings);
+  
   useEffect(() => {
     if (!socket) return;
   
@@ -39,10 +40,7 @@ const MessageContainer = () => {
       setConversations(prev =>
         prev.map(conversation =>
           conversation._id === message.conversationId
-            ? {
-                ...conversation, 
-                lastMessage: {text: message.text, sender: message.sender,},
-              }
+            ? {...conversation, lastMessage: {text: message.text, sender: message.sender,},}
             : conversation
         )
       );
@@ -88,7 +86,7 @@ const MessageContainer = () => {
 
   useEffect(() => {
     if (!selectedConversation?.userId) return;
-  
+
     let isMounted = true;
   
     const getMessages = async () => {
@@ -112,7 +110,7 @@ const MessageContainer = () => {
     return () => {
       isMounted = false;
     };
-  }, [selectedConversation?.userId]);  
+  }, [selectedConversation?.userId, conversations]);  
 
   return (
     <Flex flex={70} bg={useColorModeValue("gray.200", "gray.dark")} borderRadius={"md"} flexDirection={"column"} p={2}>
