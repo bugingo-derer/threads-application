@@ -1,13 +1,4 @@
-import {
-  Avatar,
-  Divider,
-  Flex,
-  Image,
-  Skeleton,
-  SkeletonCircle,
-  Text,
-  useColorModeValue
-} from "@chakra-ui/react";
+import { Avatar, Divider, Flex, Image, Skeleton, SkeletonCircle, Text, useColorModeValue} from "@chakra-ui/react";
 import Message from "./Message";
 import MessageInput from "./MessageInput";
 import useShowToast from "../hooks/useShowToast";
@@ -31,6 +22,7 @@ const MessageContainer = ({ conversations }) => {
   const [, setConversations] = useRecoilState(conversationsAtom);
   const messageEndRef = useRef(null);
   const sound = useRecoilValue(soundSettings);
+  const messageInputRef = useRef(null);
 
   useEffect(() => {
     if (!socket) return;
@@ -191,13 +183,17 @@ const MessageContainer = ({ conversations }) => {
         {!loadingMessages &&
           messages.map((message) => (
             <Flex key={message._id} direction="column">
-              <Message message={message} ownMessage={currentUser._id === message.sender} />
+              <Message 
+                message={message} 
+                ownMessage={currentUser._id === message.sender}
+                focusInput={() => messageInputRef.current?.focusInput()} 
+              />
             </Flex>
           ))}
         <div ref={messageEndRef} />
       </Flex>
 
-      <MessageInput setMessages={setMessages} />
+      <MessageInput setMessages={setMessages} ref={messageInputRef} />
     </Flex>
   );
 };

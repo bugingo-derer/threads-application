@@ -1,13 +1,35 @@
-import { Flex, Image, Input, InputGroup, InputRightElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Spinner, useDisclosure } from '@chakra-ui/react';
-import React, { useRef, useState } from 'react';
+import {
+  Flex,
+  Image,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  useDisclosure
+} from '@chakra-ui/react';
+import React, {
+  useImperativeHandle,
+  useRef,
+  useState,
+  forwardRef
+} from 'react';
 import { IoSendSharp } from 'react-icons/io5';
 import useShowToast from '../hooks/useShowToast';
-import { conversationsAtom, selectedConversationAtom } from '../atoms/conversationsAtom';
+import {
+  conversationsAtom,
+  selectedConversationAtom
+} from '../atoms/conversationsAtom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { BsFillImageFill } from 'react-icons/bs';
 import usePreviewImg from '../hooks/usePreviewImg';
 
-const MessageInput = ({ setMessages }) => {
+const MessageInput = forwardRef(({ setMessages }, ref) => {
   const [messageText, setMessageText] = useState('');
   const showToast = useShowToast();
   const selectedConversation = useRecoilValue(selectedConversationAtom);
@@ -16,6 +38,36 @@ const MessageInput = ({ setMessages }) => {
   const imageRef = useRef(null);
   const { onClose } = useDisclosure();
   const { handleImageChange, imgUrl, setImgUrl } = usePreviewImg();
+  const replyFocusingMessageRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    focusInput: () => {
+      if (replyFocusingMessageRef.current && !sending) {
+        replyFocusingMessageRef.current.focus();
+        replyFocusingMessageRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+        const preventFocusSteal = (e) => {
+          if (e.target !== replyFocusingMessageRef.current) {
+            e.preventDefault();
+            replyFocusingMessageRef.current.focus();
+          }
+        };
+        document.addEventListener('focusin', preventFocusSteal);
+        setTimeout(() => {
+          document.removeEventListener('focusin', preventFocusSteal);
+        }, 1000);
+        setTimeout(() => {
+          if (document.activeElement !== replyFocusingMessageRef.current) {
+            replyFocusingMessageRef.current.focus();
+          }
+        }, 600);
+      } else {
+        showToast("Error", 'Cannot focus: input is disabled or ref is not available', "error");
+      }
+    },
+  }));
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -43,18 +95,20 @@ const MessageInput = ({ setMessages }) => {
 
       setMessages((messages) => [...messages, data]);
 
-      setConversations((prevConvs) => {
-        return prevConvs.map((conversation) =>
+      setConversations((prevConvs) =>
+        prevConvs.map((conversation) =>
           conversation._id === selectedConversation._id
-            ? {...conversation, lastMessage: {text: messageText, sender: data.sender,}}
+            ? {
+                ...conversation,
+                lastMessage: { text: messageText, sender: data.sender },
+              }
             : conversation
-        );
-      });
+        )
+      );
 
       setMessageText('');
       setImgUrl('');
     } catch (error) {
-      console.log(error);
       showToast('Error', `Failed to send the message: ${error.message}`, 'error');
     } finally {
       setSending(false);
@@ -65,8 +119,21 @@ const MessageInput = ({ setMessages }) => {
     <Flex gap={2} alignItems={'center'}>
       <form onSubmit={handleSendMessage} style={{ flex: 95 }}>
         <InputGroup>
-          <Input w={'full'} placeholder='Type text' value={messageText} onChange={(e) => setMessageText(e.target.value)} isDisabled={sending}/>
-          <InputRightElement onClick={(e) => { e.preventDefault(); handleSendMessage(e); }} cursor={'pointer'}>
+          <Input
+            ref={replyFocusingMessageRef}
+            w={'full'}
+            placeholder='Type text'
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            isDisabled={sending}
+          />
+          <InputRightElement
+            onClick={(e) => {
+              e.preventDefault();
+              handleSendMessage(e);
+            }}
+            cursor={'pointer'}
+          >
             {sending ? <Spinner /> : <IoSendSharp color='green.500' />}
           </InputRightElement>
         </InputGroup>
@@ -98,6 +165,6 @@ const MessageInput = ({ setMessages }) => {
       </Modal>
     </Flex>
   );
-};
+});
 
 export default MessageInput;
