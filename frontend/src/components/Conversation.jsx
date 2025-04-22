@@ -2,8 +2,9 @@ import {Avatar, AvatarBadge, Flex, Stack, Text, useColorModeValue, WrapItem, Ima
 import React from 'react';
 import { useRecoilState } from 'recoil';
 import userAtom from '../atoms/userAtom.js';
-import { BsCheck2All, BsFillImageFill } from 'react-icons/bs';
+import { BsFillImageFill } from 'react-icons/bs';
 import { selectedConversationAtom } from '../atoms/conversationsAtom.js';
+import { FiSend } from "react-icons/fi";
 
 const Conversation = ({ conversation, isOnline }) => {
   const user = conversation?.participants?.[0];
@@ -40,7 +41,7 @@ const Conversation = ({ conversation, isOnline }) => {
         <Text fontSize={"xs"} display={"flex"} alignItems={"center"} gap={1}>
           {currentUser._id === lastMessage?.sender && (
             <Box color={lastMessage.seen ? "blue.400" : ""}>
-              <BsCheck2All size={16} />
+              <FiSend size={14} color={colorMode === "light" ? "blue.400" : "gray.light"}  />
             </Box>
           )}
           {lastMessage?.text ? (lastMessage.text.length < 15 ? lastMessage.text : lastMessage.text.slice(0, 13) + " ...") : (conversation.mock ? " " : <BsFillImageFill size={16}/>) }

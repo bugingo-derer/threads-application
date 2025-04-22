@@ -5,6 +5,7 @@ import connectDB from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
 import { app, server } from "./sockets/socket.js";
+import cors from 'cors';
 
 import userRoutes from "./routes/userRoutes.js"
 import postsRoutes from "./routes/postRoutes.js"
@@ -26,6 +27,7 @@ app.use(express.json({limit: "50mb"}));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
+app.use(cors())
 
 //api for routes:
 app.use("/api/users", userRoutes);

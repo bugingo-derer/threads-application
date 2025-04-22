@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Avatar, Flex, Box, SimpleGrid, Image, Text } from "@chakra-ui/react";
+import { Avatar, Flex, Box, SimpleGrid, Image, Text, Spinner } from "@chakra-ui/react";
 import Actions from "./Actions.jsx";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast.js";
@@ -19,6 +19,11 @@ const Post = ({ post, postedBy }) => {
   const currentUser = useRecoilValue(userAtom);
   const [posts, setPosts] = useRecoilState(postsAtom);
   const [originalDeleted, setOriginalDeleted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  const [deletedOriginalPostIds, setDeletedOriginalPostIds] = useState(new Set());
+  
+  const isForwarded = post.originalPostId && post.originalPostId !== post._id;
 
   useEffect(() => {
     const getUser = async () => {
@@ -41,13 +46,21 @@ const Post = ({ post, postedBy }) => {
     e.preventDefault();
     try {
       if (!window.confirm("Are you sure you want to delete this post?")) return;
-      const res = await fetch(`api/posts/${post._id}`, { method: "DELETE" });
+      setLoading(true);
+      
+      const res = await fetch(`/api/posts/${post._id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.error) return showToast("Error", data.error, "error");
 
       showToast("Success", data.message || "Post deleted successfully", "success");
+      
+      if (!post.originalPostId) setDeletedOriginalPostIds((prev) => new Set(prev.add(post._id)));
+
+      
       setPosts(posts.filter((p) => p._id !== post._id));
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       return showToast("Error", error.message, "error");
     }
   };
@@ -60,6 +73,7 @@ const Post = ({ post, postedBy }) => {
           const data = await res.json();
           if (res.status === 404 || data.error === "Post not found") {
             setOriginalDeleted(true);
+            setDeletedOriginalPostIds((prev) => new Set(prev.add(post.originalPostId))); // Mark original post as deleted
           }
         } catch (err) {
           console.error("Error checking original post:", err);
@@ -70,14 +84,14 @@ const Post = ({ post, postedBy }) => {
     checkOriginal();
   }, [post.originalPostId, post._id]);
 
-  const isForwarded = post.originalPostId && post.originalPostId !== post._id;
+  const isOriginalDeleted = deletedOriginalPostIds.has(post.originalPostId);
 
   return (
     <MotionBox initial={{ scale: 0.8 }} whileInView={{ scale: 1 }} transition={{duration: 0.3, ease: "easeInOut", delay: 0.2, stiffness: 120, damping: 12, type: "spring",}} viewport={{ once: true }} mb={4}>
       <Link to={`/${user?.username}/posts/${post?._id}`}>
         <Flex gap={3} mb={4} py={5}>
           {/* Left Column: Avatar & Replies */}
-          <Flex flexDirection={"column"} alignItems={"center"} onClick={(e) => {e.preventDefault();if (user) navigate(`/${user.username}`);}}>
+          <Flex flexDirection={"column"} alignItems={"center"} onClick={(e) => {e.preventDefault(); if (user) navigate(`/${user.username}`);}}>
             <Avatar size={"md"} name={user?.name} src={user?.profilePic} />
             <Box w={"1px"} h={"full"} bg={"gray.light"} my={2}></Box>
             <SimpleGrid columns={post?.replies.length >= 3 ? 3 : post?.replies.length || 1} spacing={0} justifyContent="center">
@@ -89,39 +103,26 @@ const Post = ({ post, postedBy }) => {
           {/* Right Column: Post Content */}
           <Flex flex={1} flexDirection={"column"} gap={2}>
             <Flex justifyContent={"space-between"} w={"full"}>
-              <Flex
-                alignItems={"center"}
-                mb={"20px"}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (user) navigate(`/${user.username}`);
-                }}
-              >
+              <Flex alignItems={"center"} mb={"20px"} onClick={(e) => { e.preventDefault(); if (user) navigate(`/${user.username}`); }}>
                 <Text fontSize={"sm"} fontWeight={"bold"}>{user?.username}</Text>
                 <Image src="/verified.png" w={4} h={4} ml={1} mr={2} />
                 <Text fontSize={"xs"}>
                   {isForwarded && "forwarded post"}
-                  {isForwarded && originalDeleted && (<Text fontSize={"2xs"} color="red.400">original story no longer available</Text>)}
+                  {isForwarded && isOriginalDeleted && (<Text fontSize={"2xs"} color="red.400">original story no longer available</Text>)}
                 </Text>
               </Flex>
               <Flex gap={4} alignItems={"center"}>
-                <Text fontSize={"sm"} color={"gray.light"}>
-                  {formatDate(post?.createdAt)}
-                </Text>
-                {currentUser?._id === user?._id && (
+                <Text fontSize={"sm"} color={"gray.light"}>{formatDate(post?.createdAt)}</Text>
+                {currentUser?._id === user?._id && !loading && (
                   <DeleteIcon onClick={handleDeletePost} cursor="pointer" />
                 )}
+                {loading && <Spinner size="sm" />}
               </Flex>
             </Flex>
 
             <Text fontSize={"sm"}>{post?.text}</Text>
             {post?.img && (
-              <Box
-                borderRadius={6}
-                overflow={"hidden"}
-                border={"1px solid"}
-                borderColor={"gray.light"}
-              >
+              <Box borderRadius={6} overflow={"hidden"} border={"1px solid"} borderColor={"gray.light"}>
                 <Image src={post?.img} w={"full"} />
               </Box>
             )}

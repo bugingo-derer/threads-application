@@ -46,13 +46,7 @@ const MessageInput = ({ setMessages }) => {
       setConversations((prevConvs) => {
         return prevConvs.map((conversation) =>
           conversation._id === selectedConversation._id
-            ? {
-                ...conversation,
-                lastMessage: {
-                  text: messageText,
-                  sender: data.sender,
-                },
-              }
+            ? {...conversation, lastMessage: {text: messageText, sender: data.sender,}}
             : conversation
         );
       });

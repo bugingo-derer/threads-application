@@ -125,3 +125,45 @@ export const sendMessage = async (req, res) => {
   }
 }
 
+export const deleteMessage = async (req, res) => {
+  const userId = _.get(req.user, "_id");
+  const messageId = _.get(req.params, "mid");
+
+  try {
+    const message = await Message.findById(messageId);
+    if (!message) return res.status(404).json({ error: "Message not found" });
+    if (message.deleted) return res.status(400).json({ error: "Message already deleted" });
+    if (message.sender.toString() !== userId.toString()) return res.status(400).json({ error: "You can't delete someone else's message" });
+
+    const conv = await Conversation.findById(message.conversationId);
+    if (!conv) return res.status(404).json({ error: "Conversation not found" });
+
+    message.deleted = true;
+
+    if (conv.lastMessage && conv.lastMessage.text === message.text && conv.lastMessage.sender.toString() === message.sender.toString()) {
+      conv.lastMessage = {
+        text: "This message is deleted",
+        sender: message.sender,
+        seen: message.seen,
+      };
+      await conv.save();
+    }
+    await message.save();
+
+    const participants = conv.participants.map((participant) => participant.toString());
+    participants.forEach((participantId) => {
+      const socketId = getRecipientSocketId(participantId);
+      if (socketId) {
+        io.to(socketId).emit("messageDeleted", {
+          messageId: message._id,
+          conversationId: message.conversationId,
+        });
+      }
+    });
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
+  }
+};
