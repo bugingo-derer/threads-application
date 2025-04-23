@@ -12,10 +12,14 @@ import CreatePost from "./components/CreatePost.jsx";
 import Postpage from "./pages/Postpage.jsx";
 import Chatpage from "./pages/Chatpage.jsx";
 import Settingspage from "./pages/Settingspage.jsx";
+import ForPass from "./pages/ForPass.jsx";
+import ResPass from "./pages/ResPass.jsx";
+import resetTokenAtom from "./atoms/resetTokenAtom.js";
 
 
 function App() {
   const user = useRecoilValue(userAtom);
+  const resetToken = useRecoilValue(resetTokenAtom);
   const { pathname } = useLocation();
   
   return (
@@ -25,6 +29,9 @@ function App() {
         <Routes>
           <Route path="/" element={user ? <Homepage /> : <Navigate to="/auth" />} />
           <Route path="/auth" element={!user ? <Authpage /> : <Navigate to="/" />} />
+          <Route path="/forgot" element={!user ? <ForPass /> : <Navigate to="/" />} />
+          <Route path="/reset" element={!user && resetToken ? <ResPass /> : <Navigate to="/" />} />
+          {/* <Route path="/reset" element={!user ? <ResPass /> : <Navigate to="/" />} /> */}
           <Route path="/update" element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />} />
           <Route path="/:username" element={user ? 
             (

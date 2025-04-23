@@ -11,6 +11,7 @@ import authScreenAtom from "../atoms/authAtom.js"
 import userAtom from '../atoms/userAtom.js'
 import useShowToast from '../hooks/useShowToast.js'
 import { SyncLoader } from 'react-spinners/SyncLoader'
+import { useNavigate } from 'react-router-dom'
 
 const LoginCard = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +19,8 @@ const LoginCard = () => {
   const setUser = useSetRecoilState(userAtom);
   const [inputs, setInputs] = useState({ username: "", password: "" });
   const showToast = useShowToast();
-  const [loading, setLoding] = useState(false)
+  const [loading, setLoding] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
@@ -99,6 +101,9 @@ const LoginCard = () => {
                 Don't have account? <Link color={'blue.400'}
                  onClick={() => setAuthScreen("signup")}
                 >Sign up</Link>
+              </Text>
+              <Text align={'center'}>
+                <Link color={'blue.400'} onClick={() => navigate('/forgot')}>Forgot your password</Link>
               </Text>
             </Stack>
           </Stack>

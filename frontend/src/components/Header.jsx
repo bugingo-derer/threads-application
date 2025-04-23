@@ -28,7 +28,7 @@ const Header = () => {
 					Login
 				</Link>
 			)}
-
+			
 			<Image cursor={"pointer"} alt='logo' w={6} src={colorMode === "dark" ? "/light-logo.svg" : "/dark-logo.svg"} onClick={toggleColorMode}/>
 
 			{user && (
