@@ -179,9 +179,9 @@ export const updateUser = async (req, res) => {
         await cloudinary.uploader.destroy(publicId);
       }
       
-
 			const uploadingResponse = await cloudinary.uploader.upload(profilePic);
       profilePic = cloudinary.url(uploadingResponse.public_id, {
+        timeout: 10*60*1000,
         transformation: [
           {
             quality: 'auto',

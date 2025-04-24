@@ -94,11 +94,16 @@ export const createPost = async (req, res) => {
         if(text.length > maxLength)
             return res.status(400).json({ error: `Text must be less than ${maxLength} characters` });
 
-		if (img) {
-			const uploadedResponse = await cloudinary.uploader.upload(img);
-			img = uploadedResponse.secure_url;
-		}
-
+        if (img) {            
+            const uploaded = await cloudinary.uploader.upload(img, {
+                timeout: 10*60*1000,
+                transformation: [
+                    { quality: 'auto', fetch_format: 'auto' },
+                    { width: 1200, height: 1200, crop: 'fill', gravity: 'auto' }
+                ]
+            });
+            img = uploaded.secure_url;
+        }
         const newPost = new Post({ postedBy, text, img });
         await newPost.save()
         
