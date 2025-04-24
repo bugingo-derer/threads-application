@@ -29,9 +29,8 @@ function App() {
         <Routes>
           <Route path="/" element={user ? <Homepage /> : <Navigate to="/auth" />} />
           <Route path="/auth" element={!user ? <Authpage /> : <Navigate to="/" />} />
-          <Route path="/forgot" element={!user ? <ForPass /> : <Navigate to="/" />} />
-          <Route path="/reset" element={!user && resetToken ? <ResPass /> : <Navigate to="/" />} />
-          {/* <Route path="/reset" element={!user ? <ResPass /> : <Navigate to="/" />} /> */}
+          {/* <Route path="/forgot" element={!user ? <ForPass /> : <Navigate to="/" />} /> */}
+          {/* <Route path="/reset" element={!user && resetToken ? <ResPass /> : <Navigate to="/" />} /> */}
           <Route path="/update" element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />} />
           <Route path="/:username" element={user ? 
             (

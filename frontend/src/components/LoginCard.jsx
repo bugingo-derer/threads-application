@@ -103,7 +103,7 @@ const LoginCard = () => {
                 >Sign up</Link>
               </Text>
               <Text align={'center'}>
-                <Link color={'blue.400'} onClick={() => navigate('/forgot')}>Forgot your password</Link>
+                {/* <Link color={'blue.400'} onClick={() => navigate('/forgot')}>Forgot your password</Link> */}
               </Text>
             </Stack>
           </Stack>

@@ -21,13 +21,15 @@ const sendEmail = async (option) => {
     subject: option.subject,
     html: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
       <h2 style="color: #4a90e2;">Password Reset Request</h2><br/>
-      <a href=${option.url}>Reset your password</a><br/>
-      <p>${option.url.split('/').pop()}<p/>
+      <h3>Token: </h3>
+      <p>${option.url.split('/').pop()}</p>
       <p>This reset password link will be valid for 10 minutes</p>
-      <p>If you didn't request this password reset, please ignore this email.</p>
+      <p>
+        If you didn't request this password reset, please ignore this email.       
+      </p>
       <p>Thanks,<br />The Threads Team</p>
-    </div>
-  `,
+      </div>
+    `,
   }
 
   await transporter.sendMail(emailOptions);
