@@ -75,7 +75,7 @@ export const signupUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   const loginValidation = Joi.object({
     username: Joi.string().required(),
-    password: Joi.string().min(6).required(),
+    password: Joi.string().required(),
   });
 
   try {
