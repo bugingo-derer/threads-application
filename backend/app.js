@@ -11,6 +11,7 @@ import cors from 'cors';
 import userRoutes from "./routes/userRoutes.js"
 import postsRoutes from "./routes/postRoutes.js"
 import messagesRoutes from "./routes/messageRoutes.js"
+import job from "./cron/cron.js";
 
 
 dotenv.config();
@@ -54,4 +55,5 @@ if(process.env.NODE_ENV === 'production') {
 server.listen(process.env.PORT, async () => {
   console.log(`Server started at http://localhost:${process.env.PORT}`);
   await connectDB();
+  job.start();
 });
